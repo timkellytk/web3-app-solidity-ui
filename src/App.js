@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { getWaveContract } from "./util/waveContract";
-import { connectWallet } from "./util/wallet";
+import { checkIfWalletIsConnected, connectWallet } from "./util/wallet";
 import FadeLoader from "react-spinners/FadeLoader";
 import "./App.css";
 
@@ -34,7 +34,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    connectWallet(setCurrentAccount).then((_) => getTotalWaves());
+    checkIfWalletIsConnected(setCurrentAccount).then((_) => getTotalWaves());
   }, [getTotalWaves]);
 
   return (
@@ -70,7 +70,10 @@ export default function App() {
         </button>
 
         {!currAccount && (
-          <button className="waveButton" onClick={connectWallet}>
+          <button
+            className="waveButton"
+            onClick={() => connectWallet(setCurrentAccount)}
+          >
             Connect Wallet
           </button>
         )}
