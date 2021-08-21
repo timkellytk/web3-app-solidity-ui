@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/wave-app-solidity/static/css/main.9b685743.chunk.css",
+    "main.js": "/wave-app-solidity/static/js/main.b0a8ba0f.chunk.js",
+    "main.js.map": "/wave-app-solidity/static/js/main.b0a8ba0f.chunk.js.map",
+    "runtime-main.js": "/wave-app-solidity/static/js/runtime-main.ffdfbe71.js",
+    "runtime-main.js.map": "/wave-app-solidity/static/js/runtime-main.ffdfbe71.js.map",
+    "static/js/2.65d033f0.chunk.js": "/wave-app-solidity/static/js/2.65d033f0.chunk.js",
+    "static/js/2.65d033f0.chunk.js.map": "/wave-app-solidity/static/js/2.65d033f0.chunk.js.map",
+    "index.html": "/wave-app-solidity/index.html",
+    "precache-manifest.d3ccb4b94dc828f1b9b710faa48bfc5b.js": "/wave-app-solidity/precache-manifest.d3ccb4b94dc828f1b9b710faa48bfc5b.js",
+    "service-worker.js": "/wave-app-solidity/service-worker.js",
+    "static/css/main.9b685743.chunk.css.map": "/wave-app-solidity/static/css/main.9b685743.chunk.css.map"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.ffdfbe71.js",
+    "static/js/2.65d033f0.chunk.js",
+    "static/css/main.9b685743.chunk.css",
+    "static/js/main.b0a8ba0f.chunk.js"
+  ]
+}
