@@ -1,52 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { ethers } from "ethers";
+import React, { useEffect, useState, useCallback } from "react";
+import { getWaveContract } from "./util/waveContract";
+import { connectWallet } from "./util/wallet";
+import FadeLoader from "react-spinners/FadeLoader";
 import "./App.css";
 
 export default function App() {
   const [currAccount, setCurrentAccount] = useState("");
+  const [totalWaves, setTotalWaves] = useState("");
+  const [waveTxn, setWaveTxn] = useState(null);
+  const [pendingTxn, setPendingTxn] = useState(false);
 
-  const checkIfWalletIsConnected = () => {
-    const { ethereum } = window;
-    if (!ethereum) {
-      console.log("make sure you have meta mask");
-    } else {
-      console.log("we have the ethereum object", ethereum);
-    }
-
-    ethereum
-      .request({ method: "eth_accounts" })
-      .then((accounts) => {
-        if (accounts.length !== 0) {
-          const account = accounts[0];
-          console.log("found ethereum acccount", account);
-          setCurrentAccount(account);
-        } else {
-          console.log("no ethereum account access");
-        }
-      })
-      .catch((err) => console.log("error with ethereum request", err));
+  const updateWaves = async (wavePortalContract) => {
+    const count = await wavePortalContract.getTotalWaves();
+    setTotalWaves(count.toNumber());
   };
 
-  const connectWallet = () => {
-    const { ethereum } = window;
-    if (!ethereum) {
-      alert("Get metamask!");
-    }
+  const getTotalWaves = useCallback(async () => {
+    const contract = getWaveContract();
+    await updateWaves(contract);
+  }, []);
 
-    ethereum
-      .request({ method: "eth_requestAccounts" })
-      .then((accounts) => {
-        if (accounts.length !== 0) {
-          console.log("Connected", accounts[0]);
-          setCurrentAccount(accounts[0]);
-        }
-      })
-      .catch((err) => console.log(err));
+  const wave = async () => {
+    const contract = getWaveContract();
+
+    const waveTxn = await contract.wave();
+    setPendingTxn(true);
+    setWaveTxn(waveTxn.hash);
+
+    await waveTxn.wait();
+    setPendingTxn(false);
+
+    await updateWaves(contract);
   };
 
-  const wave = () => {};
-
-  useEffect(() => checkIfWalletIsConnected(), []);
+  useEffect(() => {
+    connectWallet(setCurrentAccount).then((_) => getTotalWaves());
+  }, [getTotalWaves]);
 
   return (
     <div className="mainContainer">
@@ -55,17 +44,31 @@ export default function App() {
           <span role="img" aria-label="wave">
             👋
           </span>{" "}
-          HEY! This guy always skips CSS in tutorials :O
+          Basic wave smart contract
         </div>
 
-        <div className="bio">
-          I am farza and I worked on self-driving cars so that's pretty cool
-          right? Connect your Ethereum wallet and wave at me!
-        </div>
+        {totalWaves && (
+          <div className="bio">Total waves on the contract: {totalWaves}</div>
+        )}
+
+        {waveTxn && (
+          <div className="loadingContainer">
+            {pendingTxn && (
+              <>
+                <FadeLoader size={50} />
+                <div className="bio">Pending transaction... {waveTxn}</div>
+              </>
+            )}
+            {!pendingTxn && (
+              <div className="bio">Wave transaction: {waveTxn}</div>
+            )}
+          </div>
+        )}
 
         <button className="waveButton" onClick={wave}>
           Wave at Me
         </button>
+
         {!currAccount && (
           <button className="waveButton" onClick={connectWallet}>
             Connect Wallet
