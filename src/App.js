@@ -9,6 +9,27 @@ export default function App() {
   const [totalWaves, setTotalWaves] = useState("");
   const [waveTxn, setWaveTxn] = useState(null);
   const [pendingTxn, setPendingTxn] = useState(false);
+  const [waveMessages, setWaveMessages] = useState(false);
+
+  const updateWavesMessages = async (contract) => {
+    const waves = await contract.getAllWaves();
+
+    const wavesCleaned = [];
+    waves.forEach((wave) => {
+      wavesCleaned.push({
+        address: wave.address,
+        timestamp: new Date(wave.timestamp * 1000),
+        message: wave.message,
+      });
+    });
+
+    setWaveMessages(wavesCleaned);
+  };
+
+  const getWaveMessages = useCallback(async () => {
+    const contract = getWaveContract();
+    await updateWavesMessages(contract);
+  }, []);
 
   const updateWaves = async (wavePortalContract) => {
     const count = await wavePortalContract.getTotalWaves();
@@ -31,11 +52,17 @@ export default function App() {
     setPendingTxn(false);
 
     await updateWaves(contract);
+    await updateWavesMessages(contract);
   };
 
   useEffect(() => {
-    checkIfWalletIsConnected(setCurrentAccount).then((_) => getTotalWaves());
-  }, [getTotalWaves]);
+    checkIfWalletIsConnected(setCurrentAccount).then((_) => {
+      getTotalWaves();
+      getWaveMessages();
+    });
+  }, [getTotalWaves, getWaveMessages]);
+
+  console.log("WaveMessages", waveMessages);
 
   return (
     <div className="mainContainer">
