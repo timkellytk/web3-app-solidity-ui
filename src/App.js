@@ -8,8 +8,9 @@ export default function App() {
   const [currAccount, setCurrentAccount] = useState("");
   const [totalWaves, setTotalWaves] = useState("");
   const [waveTxn, setWaveTxn] = useState(null);
+  const [waveMessages, setWaveMessages] = useState([]);
   const [pendingTxn, setPendingTxn] = useState(false);
-  const [waveMessages, setWaveMessages] = useState(false);
+  const [waveText, setWaveText] = useState("");
 
   const updateWavesMessages = async (contract) => {
     const waves = await contract.getAllWaves();
@@ -17,7 +18,7 @@ export default function App() {
     const wavesCleaned = [];
     waves.forEach((wave) => {
       wavesCleaned.push({
-        address: wave.address,
+        address: wave.waver,
         timestamp: new Date(wave.timestamp * 1000),
         message: wave.message,
       });
@@ -41,10 +42,10 @@ export default function App() {
     await updateWaves(contract);
   }, []);
 
-  const wave = async () => {
+  const wave = async (message) => {
     const contract = getWaveContract();
 
-    const waveTxn = await contract.wave();
+    const waveTxn = await contract.wave(message);
     setPendingTxn(true);
     setWaveTxn(waveTxn.hash);
 
@@ -53,6 +54,13 @@ export default function App() {
 
     await updateWaves(contract);
     await updateWavesMessages(contract);
+  };
+
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+    if (!pendingTxn) {
+      wave(waveText);
+    }
   };
 
   useEffect(() => {
@@ -74,9 +82,9 @@ export default function App() {
           Basic wave smart contract
         </div>
 
-        {totalWaves && (
-          <div className="bio">Total waves on the contract: {totalWaves}</div>
-        )}
+        <div className="bio">
+          Total waves on the contract{totalWaves ? `: ${totalWaves}` : "..."}
+        </div>
 
         {waveTxn && (
           <div className="loadingContainer">
@@ -92,9 +100,19 @@ export default function App() {
           </div>
         )}
 
-        <button className="waveButton" onClick={wave}>
-          Wave at Me
-        </button>
+        <form onSubmit={handleFormSubmit} className="form-block">
+          <label htmlFor="wave-message">
+            Message:
+            <input
+              type="text"
+              id="wave-message"
+              required
+              value={waveText}
+              onChange={(event) => setWaveText(event.target.value)}
+            />
+          </label>
+          <input type="submit" className="waveButton" value="Wave at Me" />
+        </form>
 
         {!currAccount && (
           <button
@@ -104,6 +122,38 @@ export default function App() {
             Connect Wallet
           </button>
         )}
+
+        <div className="header">
+          <span role="img" aria-label="wave">
+            🌊
+          </span>{" "}
+          The history of waves
+        </div>
+        {waveMessages
+          .sort()
+          .reverse()
+          .map((wave, index) => {
+            return (
+              <div
+                className="bio"
+                key={wave.address + index}
+                style={{ textAlign: "center" }}
+              >
+                {wave.message} from {wave.address} on{" "}
+                {wave.timestamp.getDate() +
+                  "/" +
+                  (wave.timestamp.getMonth() + 1) +
+                  "/" +
+                  wave.timestamp.getFullYear() +
+                  " " +
+                  wave.timestamp.getHours() +
+                  ":" +
+                  wave.timestamp.getMinutes() +
+                  ":" +
+                  wave.timestamp.getSeconds()}
+              </div>
+            );
+          })}
       </div>
     </div>
   );

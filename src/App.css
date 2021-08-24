@@ -40,3 +40,17 @@
   align-items: center;
   margin: 20px 0px;
 }
+
+.form-block {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 20px 0px;
+}
+
+input {
+  outline: none;
+  width: 100%;
+  padding: 10px 8px;
+  margin-top: 10px;
+}
