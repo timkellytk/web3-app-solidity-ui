@@ -25,6 +25,18 @@ export default function App() {
     });
 
     setWaveMessages(wavesCleaned);
+
+    contract.on("NewWave", (from, timestamp, message) => {
+      console.log("NewWave", from, timestamp, message);
+      setWaveMessages((oldArray) => [
+        ...oldArray,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message: message,
+        },
+      ]);
+    });
   };
 
   const getWaveMessages = useCallback(async () => {
@@ -45,7 +57,7 @@ export default function App() {
   const wave = async (message) => {
     const contract = getWaveContract();
 
-    const waveTxn = await contract.wave(message);
+    const waveTxn = await contract.wave(message, { gasLimit: 300000 });
     setPendingTxn(true);
     setWaveTxn(waveTxn.hash);
 
