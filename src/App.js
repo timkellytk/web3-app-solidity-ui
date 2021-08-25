@@ -70,8 +70,6 @@ export default function App() {
     });
   }, [getTotalWaves, getWaveMessages]);
 
-  console.log("WaveMessages", waveMessages);
-
   return (
     <div className="mainContainer">
       <div className="dataContainer">
