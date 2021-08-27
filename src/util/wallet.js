@@ -23,18 +23,24 @@ export const checkIfWalletIsConnected = (setCurrentAccount) => {
 };
 
 export const connectWallet = (setCurrentAccount) => {
-  const { ethereum } = window;
-  if (!ethereum) {
-    alert("Get metamask!");
-  }
+  return new Promise((resolve, reject) => {
+    const { ethereum } = window;
+    if (!ethereum) {
+      alert("Get metamask!");
+    }
 
-  ethereum
-    .request({ method: "eth_requestAccounts" })
-    .then((accounts) => {
-      if (accounts.length !== 0) {
-        console.log("Connected", accounts[0]);
-        setCurrentAccount(accounts[0]);
-      }
-    })
-    .catch((err) => console.log(err));
+    ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then((accounts) => {
+        if (accounts.length !== 0) {
+          console.log("Connected", accounts[0]);
+          setCurrentAccount(accounts[0]);
+          resolve();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        reject();
+      });
+  });
 };

@@ -75,6 +75,13 @@ export default function App() {
     }
   };
 
+  const connectWalletAndLoadData = () => {
+    connectWallet(setCurrentAccount).then(() => {
+      getTotalWaves();
+      getWaveMessages();
+    });
+  };
+
   useEffect(() => {
     checkIfWalletIsConnected(setCurrentAccount).then((_) => {
       getTotalWaves();
@@ -92,78 +99,91 @@ export default function App() {
           Basic wave smart contract
         </div>
 
-        <div className="bio">
-          Total waves on the contract{totalWaves ? `: ${totalWaves}` : "..."}
-        </div>
+        {currAccount && (
+          <>
+            <div className="bio">
+              Total waves on the contract
+              {totalWaves ? `: ${totalWaves}` : "..."}
+            </div>
 
-        {waveTxn && (
-          <div className="loadingContainer">
-            {pendingTxn && (
-              <>
-                <FadeLoader size={50} />
-                <div className="bio">Pending transaction... {waveTxn}</div>
-              </>
+            {waveTxn && (
+              <div className="loadingContainer">
+                {pendingTxn && (
+                  <>
+                    <FadeLoader size={50} />
+                    <div className="bio">Pending transaction... {waveTxn}</div>
+                  </>
+                )}
+                {!pendingTxn && (
+                  <div className="bio">Wave transaction: {waveTxn}</div>
+                )}
+              </div>
             )}
-            {!pendingTxn && (
-              <div className="bio">Wave transaction: {waveTxn}</div>
-            )}
-          </div>
+            <form onSubmit={handleFormSubmit} className="form-block">
+              <label htmlFor="wave-message">
+                Message:
+                <input
+                  type="text"
+                  id="wave-message"
+                  required
+                  value={waveText}
+                  onChange={(event) => setWaveText(event.target.value)}
+                />
+              </label>
+              <input type="submit" className="waveButton" value="Wave at Me" />
+            </form>
+            <div className="header">
+              <span role="img" aria-label="wave">
+                🌊
+              </span>{" "}
+              The history of waves
+            </div>
+            {waveMessages
+              .sort()
+              .reverse()
+              .map((wave, index) => {
+                return (
+                  <div
+                    className="bio"
+                    key={wave.address + index}
+                    style={{ textAlign: "center" }}
+                  >
+                    {wave.message} from {wave.address} on{" "}
+                    {wave.timestamp.getDate() +
+                      "/" +
+                      (wave.timestamp.getMonth() + 1) +
+                      "/" +
+                      wave.timestamp.getFullYear() +
+                      " " +
+                      wave.timestamp.getHours() +
+                      ":" +
+                      wave.timestamp.getMinutes() +
+                      ":" +
+                      wave.timestamp.getSeconds()}
+                  </div>
+                );
+              })}
+          </>
         )}
-
-        <form onSubmit={handleFormSubmit} className="form-block">
-          <label htmlFor="wave-message">
-            Message:
-            <input
-              type="text"
-              id="wave-message"
-              required
-              value={waveText}
-              onChange={(event) => setWaveText(event.target.value)}
-            />
-          </label>
-          <input type="submit" className="waveButton" value="Wave at Me" />
-        </form>
 
         {!currAccount && (
-          <button
-            className="waveButton"
-            onClick={() => connectWallet(setCurrentAccount)}
-          >
-            Connect Wallet
-          </button>
+          <>
+            <div className="bio">How to play with the smart contract</div>
+            <ul>
+              <li>
+                Set up a <a href="https://metamask.io/">MetaMask</a> wallet
+              </li>
+              <li>
+                Get free Ethereum from the{" "}
+                <a href="https://faucet.rinkeby.io/">Rinkeby Faucet</a>
+              </li>
+              <li>Connect your wallet and your ready to play</li>
+            </ul>
+            <button className="waveButton" onClick={connectWalletAndLoadData}>
+              Connect Wallet
+            </button>
+          </>
         )}
-
-        <div className="header">
-          <span role="img" aria-label="wave">
-            🌊
-          </span>{" "}
-          The history of waves
-        </div>
-        {waveMessages
-          .sort()
-          .reverse()
-          .map((wave, index) => {
-            return (
-              <div
-                className="bio"
-                key={wave.address + index}
-                style={{ textAlign: "center" }}
-              >
-                {wave.message} from {wave.address} on{" "}
-                {wave.timestamp.getDate() +
-                  "/" +
-                  (wave.timestamp.getMonth() + 1) +
-                  "/" +
-                  wave.timestamp.getFullYear() +
-                  " " +
-                  wave.timestamp.getHours() +
-                  ":" +
-                  wave.timestamp.getMinutes() +
-                  ":" +
-                  wave.timestamp.getSeconds()}
-              </div>
-            );
-          })}
       </div>
     </div>
   );
